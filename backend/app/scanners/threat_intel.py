@@ -11,10 +11,10 @@ VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY")
 ABUSEIPDB_API_KEY  = os.getenv("ABUSEIPDB_API_KEY")
 
 
-# ─────────────────────────────────────────
+# ----------------------------------------
 # Source 1 — AbuseIPDB
 # Checks if IP has been reported for abuse
-# ─────────────────────────────────────────
+# ----------------------------------------
 
 def check_abuseipdb(ip: str) -> dict:
     print(f"    [AbuseIPDB] Checking {ip}...")
@@ -56,10 +56,10 @@ def check_abuseipdb(ip: str) -> dict:
     return result
 
 
-# ─────────────────────────────────────────
+# ----------------------------------------
 # Source 2 — VirusTotal
 # Checks IP/domain against 70+ AV engines
-# ─────────────────────────────────────────
+# ----------------------------------------
 
 def check_virustotal_ip(ip: str) -> dict:
     print(f"    [VirusTotal] Checking {ip}...")
@@ -126,10 +126,10 @@ def check_virustotal_domain(domain: str) -> dict:
     return result
 
 
-# ─────────────────────────────────────────
+# ----------------------------------------
 # Source 3 — Shodan
 # Gets full internet exposure info for an IP
-# ─────────────────────────────────────────
+# ----------------------------------------
 
 def check_shodan(ip: str) -> dict:
     print(f"    [Shodan] Checking {ip}...")
@@ -168,10 +168,10 @@ def check_shodan(ip: str) -> dict:
     return result
 
 
-# ─────────────────────────────────────────
+# ----------------------------------------
 # Main threat intel function
 # Runs all three checks for an asset
-# ─────────────────────────────────────────
+# ----------------------------------------
 
 def run_threat_intel(ip: str, subdomain: str) -> dict:
     print(f"\n[Threat Intel] Checking {subdomain} ({ip})")

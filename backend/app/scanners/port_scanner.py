@@ -3,9 +3,9 @@ import asyncio
 import json
 from datetime import datetime
 
-# ─────────────────────────────────────────
+# -------------------------------------------
 # Ports to scan + what service runs on them
-# ─────────────────────────────────────────
+# -------------------------------------------
 
 PORTS = {
     21:   {"service": "FTP",        "risk": "high",     "reason": "FTP transmits data in plaintext"},
@@ -42,9 +42,9 @@ RISK_SCORES = {
 }
 
 
-# ─────────────────────────────────────────
+# -------------------------------------------
 # Scan a single port on a host
-# ─────────────────────────────────────────
+# -------------------------------------------
 
 async def scan_port(ip: str, port: int, timeout: float = 2.0) -> bool:
     try:
@@ -69,10 +69,10 @@ def _check_port(ip: str, port: int, timeout: float) -> bool:
         return False
 
 
-# ─────────────────────────────────────────
+# -------------------------------------------
 # Grab banner from open port
 # Identifies exact software version
-# ─────────────────────────────────────────
+# -------------------------------------------
 
 def grab_banner(ip: str, port: int) -> str | None:
     try:
@@ -89,9 +89,9 @@ def grab_banner(ip: str, port: int) -> str | None:
         return None
 
 
-# ─────────────────────────────────────────
+# -------------------------------------------
 # Main port scan function
-# ─────────────────────────────────────────
+# -------------------------------------------
 
 async def run_port_scan(ip: str, subdomain: str) -> dict:
     print(f"\n[Port Scanner] Scanning {subdomain} ({ip})...")
@@ -144,9 +144,9 @@ async def run_port_scan(ip: str, subdomain: str) -> dict:
     }
 
 
-# ─────────────────────────────────────────
+# -------------------------------------------
 # Remediation advice per port
-# ─────────────────────────────────────────
+# -------------------------------------------
 
 def get_remediation(port: int, service: str) -> str:
     remediations = {
