@@ -31,8 +31,8 @@ export default function Topbar({ activePage, setActivePage }) {
 
   return (
     <div style={{
-      background: '#2c2e50',
-      height: '52px',
+      background: '#2c3e50',
+      height: '90px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -43,18 +43,22 @@ export default function Topbar({ activePage, setActivePage }) {
       zIndex: 100
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <ellipse cx="16" cy="16" rx="14" ry="9" stroke="#00ffff" strokeWidth="1.2"/>
-          <circle cx="16" cy="16" r="5" stroke="#00ffff" strokeWidth="1.2"/>
-          <circle cx="16" cy="16" r="2" fill="#00ffff"/>
-          <line x1="16" y1="7" x2="16" y2="5" stroke="#00ffff" strokeWidth="1"/>
-          <line x1="16" y1="25" x2="16" y2="27" stroke="#00ffff" strokeWidth="1"/>
-        </svg>
-        <div>
-          <div style={{ fontSize: '15px', fontWeight: 500, color: '#F7F6F2', letterSpacing: '0.12em' }}>JichoSec</div>
-          <div style={{ fontSize: '9px', color: '#00ffff', letterSpacing: '0.25em' }}>ATTACK SURFACE MANAGEMENT</div>
-        </div>
-      </div>
+  <img
+    src="/j.png"
+    alt="JichoSec Logo"
+    style={{ width: '70px', height: '70px', objectFit: 'contain' }}
+  />
+
+  <div>
+    <div style={{ fontSize: '15px', fontWeight: 500, color: '#F7F6F2', letterSpacing: '0.12em' }}>
+      JichoSec
+    </div>
+
+    <div style={{ fontSize: '9px', color: '#00ffff', letterSpacing: '0.25em' }}>
+      ATTACK SURFACE MANAGEMENT
+    </div>
+  </div>
+</div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
         {navItems.map(item => (

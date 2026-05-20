@@ -5,15 +5,15 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveCo
 const API = 'http://localhost:8080'
 
 const card = {
-  background: '#fff',
-  border: '1px solid #E0DDD5',
+  background: '#ffffff',
+  border: '1px solid #2c3e50',
   padding: '16px',
   marginBottom: '0'
 }
 
 const label = {
   fontSize: '9px',
-  color: '#8899aa',
+  color: '#00ffff',
   letterSpacing: '0.18em',
   marginBottom: '8px'
 }
@@ -69,21 +69,21 @@ export default function Dashboard({ scans, setScans }) {
         </div>
         <div style={{ fontSize: '10px', color: '#8899aa', textAlign: 'right', letterSpacing: '0.08em' }}>
           <div>{new Date().toDateString().toUpperCase()}</div>
-          <div style={{ color: '#C9A84C', marginTop: '2px' }}>SESSION ACTIVE</div>
+          <div style={{ color: '#0f8049', marginTop: '2px' }}>SESSION ACTIVE</div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1px', background: '#E0DDD5', border: '1px solid #E0DDD5', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1px', background: '#d5e0d7', border: '1px solid #E0DDD5', marginBottom: '20px' }}>
         {[
-          { label: 'DOMAINS SCANNED',   value: scans.length,       color: '#0A1628', accent: '#0A1628', change: `${scans.length} total` },
-          { label: 'ASSETS DISCOVERED', value: allAssets.length,   color: '#1A5276', accent: '#1A5276', change: 'subdomains found' },
-          { label: 'ACTIVE FINDINGS',   value: allFindings.length, color: '#C0392B', accent: '#C0392B', change: `${critical} critical` },
-          { label: 'THREAT INTEL HITS', value: totalIntelHits,     color: '#9A7D0A', accent: '#C9A84C', change: 'IPs flagged' },
+          { label: 'DOMAINS SCANNED',   value: scans.length,       color: '#ffffff', accent: '#ffffff', change: `${scans.length} total` },
+          { label: 'ASSETS DISCOVERED', value: allAssets.length,   color: '#05f77e', accent: '#05f77e', change: 'subdomains found' },
+          { label: 'ACTIVE FINDINGS',   value: allFindings.length, color: '#fa1e05', accent: '#fa1e05', change: `${critical} critical` },
+          { label: 'THREAT INTEL HITS', value: totalIntelHits,     color: '#f8c807', accent: '#f8c807', change: 'IPs flagged' },
         ].map((s, i) => (
-          <div key={i} style={{ background: '#F7F6F2', padding: '16px', position: 'relative' }}>
+          <div key={i} style={{ background: '#2c3e50', padding: '16px', position: 'relative' }}>
             <div style={label}>{s.label}</div>
             <div style={{ fontSize: '26px', fontWeight: 500, color: s.color, lineHeight: 1 }}>{loading ? '...' : s.value}</div>
-            <div style={{ fontSize: '10px', color: '#8899aa', marginTop: '5px' }}>{s.change}</div>
+            <div style={{ fontSize: '10px', color: '#00ffff', marginTop: '5px' }}>{s.change}</div>
             <div style={{ position: 'absolute', bottom: 0, left: '16px', right: '16px', height: '2px', background: s.accent }}></div>
           </div>
         ))}
@@ -108,9 +108,9 @@ export default function Dashboard({ scans, setScans }) {
             <div style={{ fontSize: '10px', fontWeight: 500, color: '#0A1628', letterSpacing: '0.18em', marginBottom: '8px' }}>EXPOSED SERVICES</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
               {uniqueServices.length > 0 ? uniqueServices.map(p => (
-                <span key={p} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '9px', padding: '2px 6px', fontFamily: 'monospace', borderLeft: '2px solid #C9A84C' }}>{p}</span>
+                <span key={p} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '9px', padding: '2px 6px', fontFamily: 'monospace', borderLeft: '2px solid #00ffff' }}>{p}</span>
               )) : [':80 HTTP', ':443 HTTPS', ':22 SSH', ':3306 MYSQL'].map(p => (
-                <span key={p} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '9px', padding: '2px 6px', fontFamily: 'monospace', borderLeft: '2px solid #C9A84C' }}>{p}</span>
+                <span key={p} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '9px', padding: '2px 6px', fontFamily: 'monospace', borderLeft: '2px solid #00ffff' }}>{p}</span>
               ))}
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function Dashboard({ scans, setScans }) {
                 letterSpacing: '0.08em',
                 background: s.status === 'completed' ? '#EAFAF1' : s.status === 'failed' ? '#FDEDEC' : '#FEF9E7',
                 color: s.status === 'completed' ? '#1A7A4A' : s.status === 'failed' ? '#C0392B' : '#9A7D0A',
-                borderLeft: `2px solid ${s.status === 'completed' ? '#1A7A4A' : s.status === 'failed' ? '#C0392B' : '#C9A84C'}`
+                borderLeft: `2px solid ${s.status === 'completed' ? '#1A7A4A' : s.status === 'failed' ? '#C0392B' : '#00ffff'}`
               }}>{s.status.toUpperCase()}</span>
             </div>
           ))}
@@ -181,13 +181,13 @@ export default function Dashboard({ scans, setScans }) {
             <div style={{ fontSize: '11px', color: '#8899aa', padding: '20px 0', textAlign: 'center' }}>No findings yet.</div>
           ) : allFindings.slice(0, 4).map((f, i) => (
             <div key={i} style={{ display: 'flex', gap: '10px', padding: '9px 0', borderBottom: '1px solid #F0EDE8' }}>
-              <div style={{ width: '2px', flexShrink: 0, background: f.risk === 'critical' ? '#C0392B' : f.risk === 'high' ? '#C9A84C' : '#1A5276', borderRadius: '1px' }}></div>
+              <div style={{ width: '2px', flexShrink: 0, background: f.risk === 'critical' ? '#C0392B' : f.risk === 'high' ? '#00ffff' : '#1A5276', borderRadius: '1px' }}></div>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 500, color: '#0A1628' }}>{f.title}</div>
                 <div style={{ fontSize: '10px', color: '#8899aa', marginTop: '2px' }}>{f.description}</div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
                   <span style={{ fontSize: '9px', background: '#F0EDE8', color: '#8899aa', padding: '1px 6px', letterSpacing: '0.06em' }}>{f.source ? f.source.toUpperCase() : 'SCANNER'}</span>
-                  <span style={{ fontSize: '9px', background: '#F0EDE8', color: '#0A1628', padding: '1px 6px', borderLeft: '2px solid #C9A84C' }}>{f.risk_score}</span>
+                  <span style={{ fontSize: '9px', background: '#F0EDE8', color: '#0A1628', padding: '1px 6px', borderLeft: '2px solid #00ffff' }}>{f.risk_score}</span>
                 </div>
               </div>
             </div>
