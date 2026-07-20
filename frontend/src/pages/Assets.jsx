@@ -13,12 +13,12 @@ export default function Assets() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const scansRes = await axios.get(`${API}/scans/`)
+        const scansRes = await axios.get(`${API}/scans/`, { headers: { Authorization: `Bearer ${localStorage.getItem('jichosec_token')}` } })
         const scans = scansRes.data
         const allAssets = []
         for (const s of scans) {
           if (s.status !== 'completed') continue
-          const r = await axios.get(`${API}/scans/${s.scan_id}`)
+          const r = await axios.get(`${API}/scans/${s.scan_id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('jichosec_token')}` } })
           r.data.assets.forEach(a => allAssets.push({
             ...a,
             domain: s.domain,
@@ -67,14 +67,14 @@ export default function Assets() {
             value={filter}
             onChange={e => setFilter(e.target.value)}
             placeholder="Search domain, subdomain or IP..."
-            style={{ background: '#fff', border: '1px solid #E0DDD5', padding: '6px 12px', fontSize: '11px', outline: 'none', width: '240px', borderLeft: '2px solid #C9A84C' }}
+            style={{ background: '#fff', border: '1px solid #E0DDD5', padding: '6px 12px', fontSize: '11px', outline: 'none', width: '240px' }}
           />
         </div>
       </div>
 
       <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
         {['all', 'critical', 'high', 'medium', 'low'].map(r => (
-          <button key={r} onClick={() => setRiskFilter(r)} style={{ padding: '5px 12px', fontSize: '10px', fontWeight: 500, letterSpacing: '0.08em', cursor: 'pointer', background: riskFilter === r ? '#0A1628' : '#fff', color: riskFilter === r ? '#C9A84C' : '#8899aa', border: '1px solid #E0DDD5', borderLeft: riskFilter === r ? '2px solid #C9A84C' : '1px solid #E0DDD5' }}>
+          <button key={r} onClick={() => setRiskFilter(r)} style={{ padding: '5px 12px', fontSize: '10px', fontWeight: 500, letterSpacing: '0.08em', cursor: 'pointer', background: riskFilter === r ? '#0A1628' : '#fff', color: riskFilter === r ? '#00ffff' : '#8899aa', border: '1px solid #E0DDD5' }}>
             {r.toUpperCase()} {r !== 'all' && `(${count(r)})`}
           </button>
         ))}
@@ -108,12 +108,12 @@ export default function Assets() {
                   display: 'grid',
                   gridTemplateColumns: '2fr 1.2fr 1fr 1fr 80px',
                   padding: '10px 16px',
-                  borderBottom: '1px solid #F0EDE8',
+                  borderBottom: '1px solid #000',
                   alignItems: 'center',
                   fontSize: '11px',
                   cursor: 'pointer',
-                  background: selected === i ? '#F7F6F2' : '#fff',
-                  borderLeft: selected === i ? '2px solid #C9A84C' : '2px solid transparent'
+                  background: selected === i ? '#EAF2FF' : '#fff',
+                  borderLeft: selected === i ? '2px solid #00ffff' : '2px solid transparent'
                 }}
               >
                 <div>
@@ -123,14 +123,14 @@ export default function Assets() {
                 <div style={{ fontFamily: 'monospace', fontSize: '10px', color: '#8899aa' }}>{a.ip_address || 'N/A'}</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px' }}>
                   {(a.open_ports || []).slice(0, 3).map((p, j) => (
-                    <span key={j} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '9px', padding: '1px 5px', fontFamily: 'monospace', borderLeft: '2px solid #C9A84C' }}>:{p.port}</span>
+                    <span key={j} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '9px', padding: '1px 5px', fontFamily: 'monospace', borderLeft: '2px solid #EAF2FF' }}>:{p.port}</span>
                   ))}
                   {(a.open_ports || []).length > 3 && (
                     <span style={{ fontSize: '9px', color: '#8899aa' }}>+{(a.open_ports || []).length - 3}</span>
                   )}
                 </div>
                 <div style={{ fontSize: '10px', color: '#8899aa' }}>{(a.technologies || []).join(', ') || 'Unknown'}</div>
-                <span style={{ padding: '2px 6px', fontSize: '9px', fontWeight: 500, background: riskBg(risk), color: riskColor(risk), borderLeft: `2px solid ${riskColor(risk)}` }}>{risk.toUpperCase()}</span>
+                <span style={{ padding: '2px 6px', fontSize: '9px', fontWeight: 500, background: riskBg(risk), color: riskColor(risk) }}>{risk.toUpperCase()}</span>
               </div>
             )
           })}
@@ -138,7 +138,7 @@ export default function Assets() {
 
         {selected !== null && filtered[selected] && (
           <div style={{ background: '#fff', border: '1px solid #E0DDD5', padding: '16px' }}>
-            <div style={{ marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid #F0EDE8' }}>
+            <div style={{ marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid #000' }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: '#0A1628' }}>{filtered[selected].subdomain}</div>
               <div style={{ fontSize: '10px', color: '#8899aa', marginTop: '2px', fontFamily: 'monospace' }}>{filtered[selected].ip_address}</div>
             </div>
@@ -146,27 +146,27 @@ export default function Assets() {
             <div style={{ fontSize: '9px', color: '#8899aa', letterSpacing: '0.15em', marginBottom: '8px' }}>OPEN PORTS</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '14px' }}>
               {(filtered[selected].open_ports || []).map((p, j) => (
-                <span key={j} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '10px', padding: '3px 8px', fontFamily: 'monospace', borderLeft: '2px solid #C9A84C' }}>:{p.port} {p.service}</span>
+                <span key={j} style={{ background: '#EAF2FF', color: '#0A1628', fontSize: '10px', padding: '3px 8px', fontFamily: 'monospace' }}>:{p.port} {p.service}</span>
               ))}
             </div>
 
             <div style={{ fontSize: '9px', color: '#8899aa', letterSpacing: '0.15em', marginBottom: '8px' }}>TECHNOLOGIES</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '14px' }}>
               {(filtered[selected].technologies || []).map((t, j) => (
-                <span key={j} style={{ background: '#F0EDE8', color: '#0A1628', fontSize: '10px', padding: '3px 8px', borderLeft: '2px solid #0A1628' }}>{t}</span>
+                <span key={j} style={{ background: '#EAF2FF', color: '#0A1628', fontSize: '10px', padding: '3px 8px' }}>{t}</span>
               ))}
             </div>
 
             <div style={{ fontSize: '9px', color: '#8899aa', letterSpacing: '0.15em', marginBottom: '8px' }}>FINDINGS ({(filtered[selected].findings || []).length})</div>
             {(filtered[selected].findings || []).map((f, j) => (
-              <div key={j} style={{ display: 'flex', gap: '8px', padding: '8px 0', borderBottom: '1px solid #F0EDE8' }}>
+              <div key={j} style={{ display: 'flex', gap: '8px', padding: '8px 0', borderBottom: '1px solid #000' }}>
                 <div style={{ width: '2px', background: riskColor(f.risk), flexShrink: 0 }}></div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '11px', fontWeight: 500, color: '#0A1628' }}>{f.title}</div>
                   <div style={{ fontSize: '10px', color: '#8899aa', marginTop: '2px' }}>{f.description}</div>
-                  <div style={{ fontSize: '10px', color: '#0A1628', marginTop: '4px', padding: '4px 8px', background: '#F7F6F2', borderLeft: '2px solid #C9A84C' }}>Fix: {f.remediation}</div>
+                  <div style={{ fontSize: '10px', color: '#0A1628', marginTop: '4px', padding: '4px 8px', background: '#EAF2FF' }}>Fix: {f.remediation}</div>
                 </div>
-                <span style={{ padding: '1px 6px', fontSize: '9px', background: riskBg(f.risk), color: riskColor(f.risk), borderLeft: `2px solid ${riskColor(f.risk)}`, flexShrink: 0, alignSelf: 'flex-start' }}>{f.risk.toUpperCase()}</span>
+                <span style={{ padding: '1px 6px', fontSize: '9px', background: riskBg(f.risk), color: riskColor(f.risk),  flexShrink: 0, alignSelf: 'flex-start' }}>{f.risk.toUpperCase()}</span>
               </div>
             ))}
 

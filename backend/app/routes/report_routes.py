@@ -11,23 +11,29 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
 from datetime import datetime
 from io import BytesIO
+from reportlab.platypus import Image
 import json
+
+import os
+print("Running from:", os.getcwd())
+print("Reports.py is at:", os.path.abspath(__file__))
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
-NAVY  = colors.HexColor('#0A1628')
-GOLD  = colors.HexColor('#C9A84C')
-RED   = colors.HexColor('#C0392B')
-BLUE  = colors.HexColor('#1A5276')
-GREEN = colors.HexColor('#1A7A4A')
+NAVY  = colors.HexColor('#1B2B3A')
+GOLD  = colors.HexColor('#00FFFF')
+RED   = colors.HexColor("#FD2525")
+ORANGE = colors.HexColor("#FA832D")
+BLUE  = colors.HexColor("#47D1F8")
+GREEN = colors.HexColor('#39FF14')
 GRAY  = colors.HexColor('#8899aa')
-LIGHT = colors.HexColor('#F7F6F2')
+LIGHT = colors.HexColor('#E2EAF0')
 WHITE = colors.white
 
 def risk_color(risk):
     return {
         'critical': RED,
-        'high':     GOLD,
+        'high':     ORANGE,
         'medium':   BLUE,
         'low':      GREEN
     }.get(risk, GRAY)
@@ -105,37 +111,47 @@ def generate_pdf_report(scan_id: str, db: Session = Depends(get_db)):
         pagesize=A4,
         rightMargin=20*mm,
         leftMargin=20*mm,
-        topMargin=20*mm,
+        topMargin=15*mm,
         bottomMargin=20*mm
     )
 
     styles = getSampleStyleSheet()
     story  = []
 
-    h1_style   = ParagraphStyle('h1',   fontSize=10, textColor=NAVY,  fontName='Helvetica-Bold', letterSpacing=2, spaceBefore=16, spaceAfter=8)
+    h1_style   = ParagraphStyle('h1',   fontSize=13, textColor=NAVY,  fontName='Helvetica-Bold', letterSpacing=2, spaceBefore=16, spaceAfter=8)
     body_style = ParagraphStyle('body', fontSize=10, textColor=colors.HexColor('#444444'), fontName='Helvetica', spaceAfter=4, leading=16)
     small_style= ParagraphStyle('small',fontSize=9,  textColor=GRAY,  fontName='Helvetica', spaceAfter=2)
 
-    cover_data = [[
-        Paragraph('<font color="#C9A84C">Jicho</font><font color="#FFFFFF">Sec</font>',
-                  ParagraphStyle('cover', fontSize=19, fontName='Helvetica-Bold', spaceAfter=4)),
-    ]]
-    cover_table = Table(cover_data, colWidths=[170*mm])
+    logo = Image('j.png', width=21*mm, height=21*mm)
+    brand = Paragraph(
+    '<font color="#00FFFF">Jicho</font><font color="#FFFFFF">Sec</font>',
+    ParagraphStyle(
+        'brand',
+        fontSize=28,
+        fontName='Helvetica',
+        leading=20
+    )
+)
+
+    cover_data = [
+        [logo], [brand]
+        
+    ]
+    cover_table = Table(cover_data, colWidths=[170*mm],rowHeights=[25*mm, 13*mm])
     cover_table.setStyle(TableStyle([
         ('BACKGROUND',    (0,0), (-1,-1), NAVY),
-        ('TOPPADDING',    (0,0), (-1,-1), 24),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
-        ('LEFTPADDING',   (0,0), (-1,-1), 12),
+        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING',    (0,0), (-1,-1), 10),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 12),
+        ('LEFTPADDING',   (0,0), (-1,-1), 8),
     ]))
     story.append(cover_table)
 
     info_data = [
-        [Paragraph('ATTACK SURFACE MANAGEMENT',
-                   ParagraphStyle('sub', fontSize=8, textColor=GOLD, fontName='Helvetica', letterSpacing=3))],
         [Paragraph('Security Assessment Report',
-                   ParagraphStyle('rt', fontSize=8, textColor=WHITE, fontName='Helvetica'))],
-        [Paragraph(scan.domain,
-                   ParagraphStyle('dom', fontSize=10, textColor=GOLD, fontName='Helvetica-Bold'))],
+                   ParagraphStyle('rt', fontSize=14, textColor=WHITE, fontName='Helvetica'))],
+        [Paragraph('Domain: <font color="#39FF14"><b>{}</b></font> '.format(scan.domain),
+                   ParagraphStyle('dom', fontSize=9, textColor=GRAY, fontName='Helvetica'))],
         [Paragraph('Scan ID: {}'.format(scan.id),
                    ParagraphStyle('meta', fontSize=9, textColor=GRAY, fontName='Helvetica'))],
         [Paragraph('Generated: {}'.format(datetime.now().strftime("%d %B %Y %H:%M UTC")),
@@ -145,14 +161,10 @@ def generate_pdf_report(scan_id: str, db: Session = Depends(get_db)):
     info_table.setStyle(TableStyle([
         ('BACKGROUND',    (0,0), (-1,-1), NAVY),
         ('LEFTPADDING',   (0,0), (-1,-1), 12),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
-        ('TOPPADDING',    (0,0), (-1,-1), 2),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 12),
+        ('TOPPADDING',    (0,0), (-1,-1), 15),
     ]))
     story.append(info_table)
-
-    gold_line = Table([['']], colWidths=[170*mm], rowHeights=[3])
-    gold_line.setStyle(TableStyle([('BACKGROUND', (0,0), (-1,-1), GOLD)]))
-    story.append(gold_line)
     story.append(Spacer(1, 16))
 
     story.append(Paragraph('EXECUTIVE SUMMARY', h1_style))
@@ -174,13 +186,13 @@ def generate_pdf_report(scan_id: str, db: Session = Depends(get_db)):
         ('TEXTCOLOR',    (0,1), (0,1),  NAVY),
         ('TEXTCOLOR',    (1,1), (1,1),  RED),
         ('TEXTCOLOR',    (2,1), (2,1),  RED),
-        ('TEXTCOLOR',    (3,1), (3,1),  colors.HexColor('#9A7D0A')),
+        ('TEXTCOLOR',    (3,1), (3,1),  colors.HexColor("#413E35")),
         ('ALIGN',        (0,0), (-1,-1), 'CENTER'),
         ('VALIGN',       (0,0), (-1,-1), 'MIDDLE'),
         ('TOPPADDING',   (0,0), (-1,-1), 10),
-        ('BOTTOMPADDING',(0,0), (-1,-1), 10),
-        ('GRID',         (0,0), (-1,-1), 0.5, colors.HexColor('#E0DDD5')),
-        ('BACKGROUND',   (0,1), (-1,1), LIGHT),
+        ('BOTTOMPADDING',(0,0), (-1,-1), 19),
+        ('BOX',         (0,0), (-1,-1), 0.5, colors.HexColor('#000000')),
+        ('BACKGROUND',   (0,1), (-1,1), WHITE),
     ]))
     story.append(summary_table)
     story.append(Spacer(1, 12))
@@ -218,9 +230,9 @@ def generate_pdf_report(scan_id: str, db: Session = Depends(get_db)):
         ('TOPPADDING',    (0,0), (-1,-1), 7),
         ('BOTTOMPADDING', (0,0), (-1,-1), 7),
         ('LEFTPADDING',   (0,0), (-1,-1), 6),
-        ('ROWBACKGROUNDS',(0,1), (-1,-1), [WHITE, LIGHT]),
-        ('GRID',          (0,0), (-1,-1), 0.5, colors.HexColor('#E0DDD5')),
-        ('LINEAFTER',     (0,0), (0,-1), 2, GOLD),
+        ('ROWBACKGROUNDS',(0,1), (-1,-1), [WHITE, WHITE]),
+        ('GRID',          (0,0), (-1,-1), 0.5, colors.HexColor('#000000')),
+        ('LINEAFTER',     (0,0), (0,-1), 2, NAVY),
     ]))
     story.append(at)
     story.append(Spacer(1, 16))
@@ -236,7 +248,7 @@ def generate_pdf_report(scan_id: str, db: Session = Depends(get_db)):
             rc = risk_color(f['risk'])
             finding_data = [
                 [
-                    Paragraph(f['title'], ParagraphStyle('ft', fontSize=11, fontName='Helvetica-Bold', textColor=NAVY)),
+                    Paragraph(f['title'], ParagraphStyle('ft', fontSize=11, fontName='Helvetica-Bold', textColor=LIGHT)),
                     Paragraph(f['risk'].upper(), ParagraphStyle('fr', fontSize=9, fontName='Helvetica-Bold', textColor=rc, alignment=TA_CENTER))
                 ],
                 [
@@ -256,11 +268,11 @@ def generate_pdf_report(scan_id: str, db: Session = Depends(get_db)):
             ft = Table(finding_data, colWidths=[145*mm, 25*mm])
             ft.setStyle(TableStyle([
                 ('LINEAFTER',     (0,0), (0,-1), 3, rc),
-                ('BACKGROUND',    (0,0), (-1,0), LIGHT),
+                ('BACKGROUND',    (0,0), (-1,0), NAVY),
                 ('TOPPADDING',    (0,0), (-1,-1), 6),
                 ('BOTTOMPADDING', (0,0), (-1,-1), 6),
                 ('LEFTPADDING',   (0,0), (-1,-1), 8),
-                ('GRID',          (0,0), (-1,-1), 0.5, colors.HexColor('#E0DDD5')),
+                ('BOX',          (0,0), (-1,-1), 0.5, colors.HexColor("#000000")),
                 ('SPAN',          (0,1), (1,1)),
                 ('SPAN',          (0,2), (1,2)),
                 ('SPAN',          (0,3), (1,3)),

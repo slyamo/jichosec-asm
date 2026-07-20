@@ -4,6 +4,7 @@ from app.database import engine, Base
 import app.models.models
 from app.routes.scan_routes import router as scan_router
 from app.routes.report_routes import router as report_router
+from app.routes.auth_routes import router as auth_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -23,6 +24,7 @@ app.add_middleware(
 
 app.include_router(scan_router)
 app.include_router(report_router)
+app.include_router(auth_router)
 
 @app.get("/")
 def root():

@@ -10,6 +10,9 @@ from app.scanners.dns_scanner import check_dns_security
 from app.scanners.headers_scanner import check_headers
 from app.scanners.secret_scanner import search_github
 from pydantic import BaseModel
+from app.routes.auth_routes import get_current_user
+from fastapi import APIRouter, Depends, HTTPException, Header
+from typing import Optional
 import json
 
 router = APIRouter(prefix="/scans", tags=["Scans"])
@@ -24,11 +27,20 @@ class ScanResponse(BaseModel):
     message: str
 
 @router.post("/", response_model=ScanResponse)
-async def create_scan(request: ScanRequest, db: Session = Depends(get_db)):
+async def create_scan(request: ScanRequest, db: Session = Depends(get_db), authorization: Optional[str] = Header(None)):
+    user_id = None
+    if authorization and authorization.startswith("Bearer "):
+        from app.services.auth_service import decode_token, get_user_by_email
+        payload = decode_token(authorization.replace("Bearer ", ""))
+        if payload:
+            user = get_user_by_email(db, payload.get("sub"))
+            if user:
+                user_id = user.id
+
     domain = request.domain.strip().lower()
     domain = domain.replace("https://", "").replace("http://", "").replace("www.", "")
 
-    scan = Scan(domain=domain, status=ScanStatus.running)
+    scan = Scan(domain=domain, status=ScanStatus.running, user_id=user_id)
     db.add(scan)
     db.commit()
     db.refresh(scan)
@@ -181,16 +193,26 @@ async def create_scan(request: ScanRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/")
-def list_scans(db: Session = Depends(get_db)):
-    scans = db.query(Scan).order_by(Scan.created_at.desc()).all()
+def list_scans(db: Session = Depends(get_db), authorization: Optional[str] = Header(None)):
+    user_id = None
+    if authorization and authorization.startswith("Bearer "):
+        from app.services.auth_service import decode_token, get_user_by_email
+        payload = decode_token(authorization.replace("Bearer ", ""))
+        if payload:
+            user = get_user_by_email(db, payload.get("sub"))
+            if user:
+                user_id = user.id
+    query = db.query(Scan).order_by(Scan.created_at.desc())
+    if user_id:
+        query = query.filter(Scan.user_id == user_id)
     return [
         {
-            "scan_id": s.id,
-            "domain": s.domain,
-            "status": s.status,
+            "scan_id":    s.id,
+            "domain":     s.domain,
+            "status":     s.status,
             "created_at": s.created_at
         }
-        for s in scans
+        for s in query.all()
     ]
 
 

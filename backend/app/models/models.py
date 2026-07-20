@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, DateTime, Text, ForeignKey
+from sqlalchemy import Column, String, Integer, Float, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -18,14 +18,25 @@ class RiskLevel(str, enum.Enum):
     low      = "low"
     info     = "info"
 
+class User(Base):
+    __tablename__ = "users"
+    id         = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    email      = Column(String, unique=True, nullable=False)
+    name       = Column(String, nullable=False)
+    password   = Column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+    scans      = relationship("Scan", back_populates="user", cascade="all, delete")
+
 class Scan(Base):
     __tablename__ = "scans"
     id         = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id    = Column(String, ForeignKey("users.id"), nullable=True)
     domain     = Column(String, nullable=False)
     status     = Column(String, default=ScanStatus.pending)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
     assets     = relationship("Asset", back_populates="scan", cascade="all, delete")
+    user       = relationship("User", back_populates="scans")
 
 class Asset(Base):
     __tablename__ = "assets"

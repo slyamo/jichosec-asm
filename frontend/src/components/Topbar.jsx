@@ -111,7 +111,7 @@ export default function Topbar({ activePage, setActivePage }) {
             letterSpacing: '0.1em'
           }}
         >
-          {scanning ? 'SCANNING...' : '+ NEW SCAN'}
+          {scanning ? 'SCANNING...' : ' NEW SCAN'}
         </button>
       </div>
     </div>
